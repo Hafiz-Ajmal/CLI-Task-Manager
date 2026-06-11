@@ -2,8 +2,6 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from fastapi import FastAPI,Path,Depends,APIRouter,Query,HTTPException
-#from models import Task,TaskCreate,TaskUpdate ,UserInDB,UserOut,User,Token,TokenData
-#from dependencies import tasks,task_by_ID
 from typing import Annotated
 from datetime import datetime ,timedelta , timezone
 

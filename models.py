@@ -26,7 +26,7 @@ class TaskUpdate(SQLModel):
     title:str |None=None
     description:str |None=None
     completed:bool=Field(default=False)
-    # updated_at:datetime=Field(default_factory=datetime.now) #now() wrong...this will call immediately nor passing the func
+   
 
 class TaskPublic(TaskBase):
     id:int

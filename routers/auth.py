@@ -23,16 +23,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
   
 
 
-# fake_users_db = {
-#     "johndoe": {
-#         "username": "johndoe",
-#         "full_name": "John Doe",
-#         "email": "johndoe@example.com",
-#         "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$wagCPXjifgvUFBzq4hqe3w$CYaIb8sB+wtD+Vu/P4uod1+Qof8h+1g7bbDlBID48Rc",
-#         "disabled": False,
-#     },
-   
-# }
+
 
 pwd_context=CryptContext(schemes=["bcrypt"],deprecated="auto")
 
@@ -130,29 +121,6 @@ def login(form_data:Annotated[OAuth2PasswordRequestForm,Depends()],session:sessi
 @router.get("/me",response_model=UserOut)
 def read_me(current_user:Annotated[UserDB,Depends(get_current_active_user)]):
     return current_user
-
-
-# @router.get("/show")
-# def print():
-#     return fake_users_db
-        
-
-
-
-# DUMMY_HASH=PasswordHash.hash("dummyPassword")
-# password_hash=PasswordHash.rocomended()
-# @router.post("/auth/token")
-# async def login(form_data:OAuth2PasswordRequestForm=Depends()):
-#     username=form_data.username
-#     plain_password=form_data.password
-#     if username in users:
-#         hashed=hash_password(plain_password)
-#         if verifyPassword(plain_password,hashed):
-#             access_token= jwt.encode({"sub":username},SECRET_KEY,algorithm=ALGORITHM) 
-#             return {"access_token":access_token,"Token_type":"Bearer"}
-        
-#     verifyPassword(plain_password,"Dummy Hash")
-#     raise HTTPException(status_code="401",detail="username and password are not correct") 
 
 
 

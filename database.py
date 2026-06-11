@@ -5,11 +5,8 @@ from datetime import  datetime
 
 
 
-# sqlite_file_name="database.db"
-# sqlite_file_url=f"sqlite:///{sqlite_file_name}"
 
-# connect_args={"check_same_thread":False}
-#engine=create_engine(sqlite_file_url,connect_args=connect_args)
+
 
 engine = create_engine("postgresql://ajmal:ajmal01@localhost/taskmanager")
 
