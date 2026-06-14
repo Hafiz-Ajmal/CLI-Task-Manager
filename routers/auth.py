@@ -2,7 +2,7 @@
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from fastapi.security import OAuth2AuthorizationCodeBearer,OAuth2PasswordRequestForm,OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer
 from passlib.context import CryptContext
 from jose import jwt
 from jose.exceptions import JWTError
@@ -42,16 +42,11 @@ DUMMY_HASH = hash_password("dummypassword")
 
 
 def get_user(username:str,db:Session):
-    user=db.exec(select(UserDB).where(UserDB.username==username)).first()
-    if not user:
-        raise HTTPException(status_code=404,detail="User Not Found")
+    user=db.exec(select(UserDB).where(UserDB.username==username)).first() #no need to check user its work of authentication else authentication time logic will not work
     return user
     
   
-def get_current_active_user(current_user:Annotated[UserDB,Depends(get_current_user)]):
-    if current_user.disabled:
-        raise HTTPException(status_code=400,detail="Inactive user")
-    return current_user
+
 
 
 @router.post("/register",response_model=UserOut)
@@ -81,15 +76,18 @@ def get_current_user(token:Annotated[str,Depends(auth_2)],session:session_Dep)->
         raise credentials_exception
     return user
 
+def get_current_active_user(current_user:Annotated[UserDB,Depends(get_current_user)]):
+    if current_user.disabled:
+        raise HTTPException(status_code=400,detail="Inactive user")
+    return current_user
+
 def authenticate_user(session:Session,username:str,password:str):
     user=get_user(username,session)
     if not user:
         verifyPassword(password,DUMMY_HASH)
         raise HTTPException(status_code=402,detail="authenticate user")
-        return False
     if not verifyPassword(password,user.hashed_password):
         raise HTTPException(status_code=401,detail="authenticate user 2")
-        return False
     return user
     
         
