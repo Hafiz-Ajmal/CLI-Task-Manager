@@ -17,7 +17,7 @@ from sqlmodel import select,Session
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-SECRET_KEY="121212121234@3780%^&3082973489y"
+SECRET_KEY="b298a9d430aaf1ad8c3c9becf43d49898d8228752156a4678fbedf35ab6cee5a"
 ALGORITHM="HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
   
