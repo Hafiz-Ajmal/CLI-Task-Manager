@@ -1,0 +1,34 @@
+
+name: Task Manager CI/CD
+on:
+  push:
+    branches:
+      main
+
+  pull_rquest:
+    branch:
+      main
+jobs:
+  test:
+    run-on: ubunto-latest
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: setup python
+        uses: actions/setup-python@v5
+        with: 
+          python-version: "3.12"
+      - name: Run Tests
+        run: pytest  -v
+
+  deploy:
+    needs: test
+    if: github.ref == 'ref/heads/main'
+    runs_on:
+      ubunto-latest
+    steps:
+      - name: Trigger Render Deploy 
+        run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+          
+
