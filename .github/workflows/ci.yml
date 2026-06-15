@@ -3,14 +3,12 @@ name: Task Manager CI/CD
 on:
   push:
     branches:
-      main
+      - main
 
-  pull_rquest:
-    branch:
-      main
+  
 jobs:
   test:
-    run-on: ubunto-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: checkout code
@@ -19,14 +17,15 @@ jobs:
         uses: actions/setup-python@v5
         with: 
           python-version: "3.12"
+      - name: Add dependencies
+        run: pip install -r requirements.txt   
       - name: Run Tests
         run: pytest  -v
 
   deploy:
     needs: test
-    if: github.ref == 'ref/heads/main'
-    runs_on:
-      ubunto-latest
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
     steps:
       - name: Trigger Render Deploy 
         run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
