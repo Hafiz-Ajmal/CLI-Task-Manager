@@ -3,6 +3,9 @@
 from sqlmodel import Session,create_engine,SQLModel,select,Field
 from datetime import  datetime
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 DB_URL=os.getenv("DATABASE_URL")
 

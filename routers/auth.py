@@ -14,10 +14,11 @@ from datetime import timedelta,timezone,datetime
 from dependencies import session_Dep
 from models import TaskDB ,UserDB,UserCreate,UserOut,User,UserUpdate,TaskUpdate,Token,TokenData,TaskCreate,TaskBase,TaskPublic
 from sqlmodel import select,Session
+import os
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-SECRET_KEY="b298a9d430aaf1ad8c3c9becf43d49898d8228752156a4678fbedf35ab6cee5a"
+SECRET_KEY=os.getenv("SECRET_KEY")
 ALGORITHM="HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
   
