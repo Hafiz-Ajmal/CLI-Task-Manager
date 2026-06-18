@@ -5,10 +5,19 @@ from fastapi.testclient import TestClient
 from main import app
 from dependencies import get_session
 from sqlalchemy.pool import StaticPool
+from typing import Annotated
+from routers.auth import create_user ,UserCreate ,login
+from fastapi import Depends
 
 
 TEST_DB_URL="sqlite://"
 engine=create_engine(TEST_DB_URL,connect_args={"check_same_thread":False},poolclass=StaticPool)
+
+
+
+
+
+
 
 def get_session_override():
     with Session(engine) as session:
@@ -27,4 +36,11 @@ def session_fixture():
 def client_fixture():
     client=TestClient(app)
     yield client
+
+
+def get_authenticated_token(client:TestClient,username:str,password:str,):
+    client.post("/auth/register",json={"username":username,"password":password})
+    response=client.post("/auth/token",data={"username":username,"password":password})
+    dict=response.json()
+    return dict["access_token"]
 

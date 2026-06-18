@@ -1,0 +1,72 @@
+
+
+
+
+
+
+
+from fastapi import APIRouter ,Depends,HTTPException
+import google.generativeai as genai
+import os
+from dependencies import  get_session , Session 
+from routers.auth import get_current_user
+from models import UserDB ,TaskDB
+
+router= APIRouter(prefix="/ai",tags=["AI Features"])
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+model=genai.GenerativeModel("gemini-2.5-flash")
+
+
+CATEGORY_PROMPT= """
+You are a smart task organizer.
+
+Categorize this task into EXACTLY ONE category.
+
+Task Title: {title}
+Task Description: {description}
+
+Available categories:
+- Work: Job, office, business, meetings, projects, clients, coding, development.
+- Personal: Family, friends, home, hobbies, personal errands.
+- Urgent: Tasks requiring immediate attention, deadlines, emergencies.
+- Learning: Studying, courses, tutorials, reading educational material, practice.
+- Health: Exercise, gym, doctor appointments, medicine, diet, fitness.
+- Finance: Bills, banking, taxes, payments, budgeting, investments.
+- Other: Anything that does not clearly fit the above categories.
+
+Rules:
+1. Return exactly one category.
+2. Choose the best matching category.
+3. Return only the category name.
+4. Do not explain your answer.
+
+
+Category:
+"""
+@router.post("/Ctegorize/{task_id}")
+def categorize_task(task_id:int,session:Session=Depends(get_session),current_user:UserDB=Depends(get_current_user)):
+
+    task=session.get(TaskDB,task_id)
+
+    if not task:
+        raise HTTPException(status_code=401,detail="Task Not Found")
+    
+    if (task.owner!=current_user.id): 
+        raise HTTPException(status_code=401,detail="Task Owner is not you")
+    
+    category_types=["Urgent","Learning","Personal","Work","Health","Finanace"]
+
+    prompt=format(title={"title"},description={"description"},user_id={current_user.id})
+
+    response=model.generate_content(prompt)
+    category=response.text.strip().upper()
+
+    if category in category_types:
+        return category
+    else :
+        return "other"
+
+
+
+
+

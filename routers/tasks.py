@@ -28,35 +28,41 @@ from models import User,UserUpdate,UserCreate,UserDB,UserOut
 
 router=APIRouter(prefix="/tasks",tags=["tasks"])
 
-global_id:int =1
 
 
 @router.get("",response_model=list[TaskPublic])  #tasks is just list but of which
 def get_all_tasks(current_user: Annotated[str, Depends(get_current_user)],session:session_Dep):
-    tasks = session.exec(select(TaskDB)).all()
-    if len(tasks)<1:
-        return []
+    tasks = session.exec(select(TaskDB).where(TaskDB.owner_id==current_user.id)).all()
     return tasks
 
 @router.get("/{task_id}")
 def get_by_id(task_id:int,current_user: Annotated[str, Depends(get_current_user)],session:session_Dep):
     task=session.get(TaskDB,task_id)
-    return task
+    if not task:
+         raise HTTPException(status_code=404,detail="Task not found")
+    if task.owner_id==current_user.id:
+        return task
+    raise HTTPException(status_code=404,detail="Task not found")
     
 
 @router.post("",response_model=TaskPublic)
 def create_task(task:TaskCreate,session:session_Dep,current_user: Annotated[str, Depends(get_current_user)]):
-    new_task=TaskDB.model_validate(task)
+    task_dict=task.model_dump()
+    task_dict.update({"owner_id":current_user.id})
+    new_task=TaskDB(**task_dict)
     session.add(new_task)
     session.commit()
     session.refresh(new_task)
     return new_task
 
 @router.put("/{task_id}",response_model=TaskPublic)
-def update_task(task_id:int,newTask:TaskUpdate,session:session_Dep,current_user: Annotated[str, Depends(get_current_user)]):
+def update_task(task_id:int,newTask:TaskUpdate,session:session_Dep,current_user: Annotated[UserDB, Depends(get_current_user)]):
         task=session.get(TaskDB,task_id)
         if not task:
-            raise HTTPException(status_code=404,detail="Task Not Found")
+            raise HTTPException(status_code=404,detail="Task not found")
+        if task.owner_id !=current_user.id:
+             raise HTTPException(status_code=404,detail="Task not found")
+             
         input_task=newTask.model_dump(exclude_unset=True)
         input_task["updated_at"] = datetime.now()
         task.sqlmodel_update(input_task)   
@@ -71,7 +77,9 @@ def update_task(task_id:int,newTask:TaskUpdate,session:session_Dep,current_user:
 def delete_task_by_id(task_id:Annotated[int,Path(ge=1)],session:session_Dep ,current_user: Annotated[str, Depends(get_current_user)]):
     task=session.get(TaskDB,task_id)
     if not task:
-        raise HTTPException(status_code=404,detail="Task Not Found")   
+        raise HTTPException(status_code=404,detail="Task not found")  
+    if task.owner_id !=current_user.id:
+             raise HTTPException(status_code=404,detail="Task not found") 
     session.delete(task)
     session.commit()
     return {"Deleted":task}

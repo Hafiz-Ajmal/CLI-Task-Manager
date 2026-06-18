@@ -15,6 +15,11 @@ from dependencies import session_Dep
 from models import TaskDB ,UserDB,UserCreate,UserOut,User,UserUpdate,TaskUpdate,Token,TokenData,TaskCreate,TaskBase,TaskPublic
 from sqlmodel import select,Session
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+print(f"SECRET_KEY type: {type(os.getenv("SECRET_KEY"))}")
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -22,6 +27,7 @@ SECRET_KEY=os.getenv("SECRET_KEY")
 ALGORITHM="HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
   
+
 
 
 
@@ -68,11 +74,11 @@ def get_current_user(token:Annotated[str,Depends(auth_2)],session:session_Dep)->
     try:
         payload=jwt.decode(token,SECRET_KEY,algorithms=[ALGORITHM])
         username=payload["sub"]
-        if username is None:
+    except JWTError as e:
+        raise HTTPException(status_code=401, detail="Invalid/Expired Token")
+    if username is None:
             raise credentials_exception
-        user=get_user(username,session)
-    except JWTError:
-        raise HTTPException(status_code=401,detail="Invalid/Expired Token")
+    user=get_user(username,session)
     if user is None:
         raise credentials_exception
     return user
@@ -86,9 +92,9 @@ def authenticate_user(session:Session,username:str,password:str):
     user=get_user(username,session)
     if not user:
         verifyPassword(password,DUMMY_HASH)
-        raise HTTPException(status_code=402,detail="authenticate user")
+        raise HTTPException(status_code=401,detail="Incorrect username or password")
     if not verifyPassword(password,user.hashed_password):
-        raise HTTPException(status_code=401,detail="authenticate user 2")
+        raise HTTPException(status_code=401,detail="Incorrect username or password")
     return user
     
         
