@@ -59,7 +59,7 @@ Category:
 """
 
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY","dummy-key-for-testing")) #for github
 
 
 

@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DB_URL=os.getenv("DATABASE_URL")
+DB_URL=os.getenv("DATABASE_URL","sqlite:///./test.db") #for Github
 
 engine = create_engine(DB_URL)
 
