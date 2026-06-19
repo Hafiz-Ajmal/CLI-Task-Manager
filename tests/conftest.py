@@ -8,6 +8,7 @@ from sqlalchemy.pool import StaticPool
 from typing import Annotated
 from routers.auth import create_user ,UserCreate ,login
 from fastapi import Depends
+from unittest.mock import patch , MagicMock
 
 
 TEST_DB_URL="sqlite://"
@@ -37,6 +38,16 @@ def client_fixture():
     client=TestClient(app)
     yield client
 
+@pytest.fixture(autouse=True)
+def mock_gemini():
+    with patch("routers.ai_tasks.client") as mock_client:
+        mock_response=MagicMock()
+        mock_response.text="Work"
+        mock_client.models.generate_content.return_value=mock_response
+        yield mock_client
+
+
+
 
 def get_authenticated_token(client:TestClient,username:str,password:str,):
     client.post("/auth/register",json={"username":username,"password":password})
@@ -44,3 +55,8 @@ def get_authenticated_token(client:TestClient,username:str,password:str,):
     dict=response.json()
     return dict["access_token"]
 
+
+
+
+
+    

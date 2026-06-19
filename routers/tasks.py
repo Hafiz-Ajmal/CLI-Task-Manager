@@ -16,11 +16,11 @@ from routers.auth import SECRET_KEY,ALGORITHM,ACCESS_TOKEN_EXPIRE_MINUTES
 from database import engine
 
 from dependencies import session_Dep
-#from database import TaskPublic,TaskDB,TaskCreate,TaskUpdate
+
 from sqlmodel import Session ,select
 from models import TaskBase,TaskCreate,TaskDB,TaskPublic,TaskUpdate,Token,TokenData
 from models import User,UserUpdate,UserCreate,UserDB,UserOut
-
+from routers.ai_tasks import get_category
 
 
 
@@ -47,8 +47,10 @@ def get_by_id(task_id:int,current_user: Annotated[str, Depends(get_current_user)
 
 @router.post("",response_model=TaskPublic)
 def create_task(task:TaskCreate,session:session_Dep,current_user: Annotated[str, Depends(get_current_user)]):
+    category = get_category(task.title, task.description)
     task_dict=task.model_dump()
-    task_dict.update({"owner_id":current_user.id})
+   
+    task_dict.update({"owner_id": current_user.id, "category": category})
     new_task=TaskDB(**task_dict)
     session.add(new_task)
     session.commit()

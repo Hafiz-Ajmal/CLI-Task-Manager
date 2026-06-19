@@ -34,6 +34,7 @@ class TaskPublic(TaskBase):
     created_at:datetime
     updated_at:datetime
     owner_id: int
+    category:str
 
 class TaskDB(TaskBase,table=True):
     id:int | None=Field(default=None,primary_key=True)
@@ -41,6 +42,7 @@ class TaskDB(TaskBase,table=True):
     updated_at:datetime=Field(default_factory=datetime.now)
     owner_id: int=Field(foreign_key="userdb.id")
     owner:"UserDB"=Relationship(back_populates="tasks")
+    category:str|None=None
 
 class User(SQLModel):
     username:str
