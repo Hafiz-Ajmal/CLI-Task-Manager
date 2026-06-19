@@ -23,7 +23,7 @@ print(f"SECRET_KEY type: {type(os.getenv("SECRET_KEY"))}")
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-SECRET_KEY=os.getenv("SECRET_KEY")
+SECRET_KEY=os.getenv("SECRET_KEY","dummy-secret-key-for-testing-only") #github 
 ALGORITHM="HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
   
