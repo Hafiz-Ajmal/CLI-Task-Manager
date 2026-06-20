@@ -40,7 +40,7 @@ class TaskDB(TaskBase,table=True):
     id:int | None=Field(default=None,primary_key=True)
     created_at:datetime=Field(default_factory=datetime.now)
     updated_at:datetime=Field(default_factory=datetime.now)
-    owner_id: int=Field(foreign_key="userdb.id")
+    owner_id: int=Field(default=None,foreign_key="userdb.id")
     owner:"UserDB"=Relationship(back_populates="tasks")
     category:str|None=None
 

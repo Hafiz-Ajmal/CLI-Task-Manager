@@ -76,9 +76,12 @@ def categorize(task_id:int,session:session_Dep,user:UserDB=Depends(get_current_u
 
 def get_category(title:str,description:str)->str:
 
-    prompt=CATEGORY_PROMPT.format(title=title,description=description)
-    response=client.models.generate_content(model="gemini-2.5-flash",contents=prompt)
-    return response.text #why not return response
+    try:
+        prompt = CATEGORY_PROMPT.format(title=title, description=description)
+        response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+        return response.text.strip() #why not return response
+    except Exception:
+        return "Other" 
 
 
 
